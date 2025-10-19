@@ -133,6 +133,18 @@ constructor(parentElement, data) {
         let dot = vis.svg.selectAll("circle")
             .data(vis.data);
 
+		// Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
+		// Its opacity is set to 0: we don't see it by default.
+		let tooltip = d3.select("#chart-area")
+			.append("div")
+			.style("opacity", 0)
+			.attr("class", "tooltip")
+			.style("background-color", "white")
+			.style("border", "solid")
+			.style("border-width", "1px")
+			.style("border-radius", "5px")
+			.style("padding", "10px")
+
         dot.enter().append("circle")
 			.attr("class", d => "dot " + d.species)
 			.merge(dot)
@@ -147,20 +159,29 @@ constructor(parentElement, data) {
 					.transition()
 					.duration(200)
 					.style("fill", "lightgrey")
-					.attr("r", 3)
+					.attr("r", 3);
 
-					d3.selectAll("." + specie)
+				d3.selectAll("." + specie)
 					.transition()
 					.duration(200)
 					.style("fill", colour(specie))
-					.attr("r", 7)
+					.attr("r", 7);
+
+				tooltip
+					.style("opacity", 1)
+					.html(specie);
 			})
     		.on("mouseleave", function () {
 				d3.selectAll(".dot")
 					.transition()
 					.duration(200)
 					.style("fill", "lightgrey")
-					.attr("r", 5 )
+					.attr("r", 5 );
+
+				tooltip
+					.transition()
+					.duration(200)
+					.style("opacity", 0);
 			});
 		
 		dot.transition().duration(1000);
