@@ -46,29 +46,11 @@ constructor(parentElement, data) {
 			.attr("height", vis.height);
 
 		// Scales and axes
-        let maxSepalWidth = d3.max(vis.data, function(d) {
-            return d.sepal_width;
-        });
-        let maxPetalWidth = d3.max(vis.data, function(d) {
-            return d.petal_width;
-        });
-        let maxWidth = Math.max(maxSepalWidth, maxPetalWidth);
-
 		vis.x = d3.scaleLinear()
-			.range([0, vis.width])
-			.domain([0, maxWidth]);
-
-        let maxSepalLength = d3.max(vis.data, function(d) {
-            return d.sepal_length;
-        });
-        let maxPetalLength = d3.max(vis.data, function(d) {
-            return d.petal_length;
-        });
-        let maxLength = Math.max(maxSepalLength, maxPetalLength);
+			.range([0, vis.width]);
 
 		vis.y = d3.scaleLinear()
-			.range([vis.height, 0])
-            .domain([0, maxLength]);
+			.range([vis.height, 0]);
 
 		vis.xAxis = d3.axisBottom()
 			.scale(vis.x);
@@ -97,41 +79,103 @@ constructor(parentElement, data) {
 		let vis = this;
 
 		// Update the visualization
-		vis.updateVis("setosa");
+		vis.updateVis("sepal_width", "petal_width");
 	}
 
 	/*
 	 * The drawing function - should use the D3 update sequence (enter, update, exit)
  	* Function parameters only needed if different kinds of updates are needed
  	*/
-	updateVis(option){
+	updateVis(sepalOption, petalOption){
 		let vis = this;
 
-		let filteredData = vis.data.filter((d) => d.species == option);
+		let colour = d3.scaleOrdinal()
+			.domain(["setosa", "versicolor", "virginica" ])
+			.range([ "#440154ff", "#21908dff", "#fde725ff"]);
 
-        let group = vis.svg.selectAll("g")
-            .data(filteredData);
+		let sepalOptions = ["sepal_width", "sepal_length"];
+		let sepalOptionIndex = 0;
+		if (sepalOption == "sepal_width") {
+			sepalOptionIndex = 0;
+		}
+		else if (sepalOption == "sepal_length") {
+			sepalOptionIndex = 1;
+		}
 
-        group.enter().append("g");
+		let petalOptions = ["petal_width", "petal_length"];
+		let petalOptionIndex = 0;
+		if (petalOption == "petal_width") {
+			petalOptionIndex = 0;
+		}
+		else if (petalOption == "petal_length") {
+			petalOptionIndex = 1;
+		}
 
-		group.append("circle")
-            .attr("class", "dot")
+		let maxX = d3.max(vis.data, function(d) {
+			return d[sepalOptions[sepalOptionIndex]];
+		});
+
+		let minX = d3.min(vis.data, function(d) {
+			return d[sepalOptions[sepalOptionIndex]];
+		});
+
+		let maxY = d3.max(vis.data, function(d) {
+			return d[petalOptions[petalOptionIndex]];
+		});
+
+		let minY = d3.min(vis.data, function(d) {
+			return d[petalOptions[petalOptionIndex]];
+		})
+
+		vis.x.domain([minX, maxX]);
+		vis.y.domain([minY, maxY]);
+
+        let dot = vis.svg.selectAll("circle")
+            .data(vis.data);
+
+        dot.enter().append("circle")
+			.attr("class", d => "dot " + d.species)
+			.merge(dot)
+            .attr("cx", d => vis.x(d[sepalOptions[sepalOptionIndex]]))
+            .attr("cy", d => vis.y(d[petalOptions[petalOptionIndex]]))
+            .attr("r", 5)
+			.attr("fill", function (d) { return colour(d.species) })
+			.on("mouseover", function (d) {
+				let specie = d.srcElement.__data__.species;
+				
+				d3.selectAll(".dot")
+					.transition()
+					.duration(200)
+					.style("fill", "lightgrey")
+					.attr("r", 3)
+
+					d3.selectAll("." + specie)
+					.transition()
+					.duration(200)
+					.style("fill", colour(specie))
+					.attr("r", 7)
+			})
+    		.on("mouseleave", function () {
+				d3.selectAll(".dot")
+					.transition()
+					.duration(200)
+					.style("fill", "lightgrey")
+					.attr("r", 5 )
+			});
+		
+		dot.transition().duration(1000);
+
+        dot.exit().remove();
+
+		// Update axis by calling the axis function
+		vis.svg.select(".x-axis")
 			.transition()
 			.duration(1000)
-            .attr("cx", function(d){ return vis.x(d.sepal_width); })
-            .attr("cy", function(d){ return vis.y(d.sepal_length); })
-            .attr("r", 5)
-			.attr("fill", "#2ea34d")
-
-		group.append("circle")
-            .attr("class", "dot")
+			.call(vis.xAxis);
+		
+		vis.svg.select(".y-axis")
 			.transition()
 			.duration(1000)
-			.attr("cx", function(d){ return vis.x(d.petal_width); })
-            .attr("cy", function(d){ return vis.y(d.petal_length); })
-            .attr("r", 5)
-			.attr("fill", "#4a39a8")
-
-        group.exit().remove();
+			.call(vis.yAxis);
 	}
 }

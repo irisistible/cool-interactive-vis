@@ -22,9 +22,10 @@ function loadData() {
 		scatterplot.initVis();
     });
 
-    d3.select("#ranking-type").on("change", function() {
-        let option = d3.select("#ranking-type").property("value");
-        scatterplot.updateVis(option);
+    d3.selectAll(".form-control").on("change", function() {
+        let sepalOption = d3.select("#sepal-dimension").property("value");
+        let petalOption = d3.select("#petal-dimension").property("value");
+        scatterplot.updateVis(sepalOption, petalOption);
     });
 }
 
