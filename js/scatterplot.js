@@ -142,7 +142,7 @@ constructor(parentElement, data) {
 		}
 
 		let filteredData = vis.data.filter(function(d) {
-			return checks[d.species]
+			return (checks[d.species] == 1)
 		});
 
 		let maxX = d3.max(filteredData, function(d) {
@@ -165,35 +165,60 @@ constructor(parentElement, data) {
 		vis.y.domain([minY, maxY]);
 
         let dot = vis.svg.selectAll("circle")
-            .data(filteredData);
+            .data(vis.data);
 
         dot.enter().append("circle")
 			.attr("class", d => "dot " + d.species)
 			.merge(dot)
             .attr("cx", d => vis.x(d[sepalOptions[sepalOptionIndex]]) + 50)
             .attr("cy", d => vis.y(d[petalOptions[petalOptionIndex]]))
-            .attr("r", 5)
+            .attr("r", function (d) {
+				if (checks[d.species] == 1) {
+					return 5
+				}
+				else {
+					return 0
+				}
+			})
 			.attr("fill", function (d) { return colour[d.species] })
-			.on("mousemove", function (event, d) {			
-				d3.selectAll("." + d.species)
-					.transition()
-					.duration(200)
-					.style("fill", colour[d.species])
-					.style("opacity", 1)
-					.attr("r", 10);
+			.on("mousemove", function (event, d) {
+				if (checks[d.species] == 1) {
+					d3.selectAll("." + d.species)
+						.transition()
+						.duration(200)
+						.style("fill", colour[d.species])
+						.style("opacity", 1)
+						.attr("r", 10);
 
-				vis.tooltip
-					.style("opacity", 1)
-					.style("left", event.pageX + 20 + "px")
-                	.style("top", event.pageY + "px")
-					.text("Specie: " + d.species);
-				})
+					vis.tooltip
+						.style("opacity", 1)
+						.style("left", event.pageX + 20 + "px")
+						.style("top", event.pageY + "px")
+						.text("Specie: " + d.species);
+				}
+			})
     		.on("mouseleave", function () {
-				d3.selectAll(".dot")
+				if (checks["setosa"] == 1) {
+					d3.selectAll(".setosa")
 					.transition()
 					.duration(200)
 					.style("opacity", 0.5)
 					.attr("r", 5);
+				}
+				if (checks["versicolor"] == 1) {
+					d3.selectAll(".versicolor")
+					.transition()
+					.duration(200)
+					.style("opacity", 0.5)
+					.attr("r", 5);
+				}
+				if (checks["virginica"] == 1) {
+					d3.selectAll(".virginica")
+					.transition()
+					.duration(200)
+					.style("opacity", 0.5)
+					.attr("r", 5);
+				}
 				
 				vis.tooltip
 					.transition()

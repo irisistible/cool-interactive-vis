@@ -32,21 +32,21 @@ function loadData() {
     
     // Add event listeners
     d3.selectAll(".form-control").on("change", function() {
-        scatterplot.updateVis(check(setosaCheckbox, versicolorCheckbox, virginicaCheckbox), d3.select("#sepal-dimension").property("value"),
-            d3.select("#petal-dimension").property("value"));
+        scatterplot.updateVis(check(document.getElementById('setosa-check'), document.getElementById('versicolor-check'),
+            document.getElementById('virginica-check')), d3.select("#sepal-dimension").property("value"), d3.select("#petal-dimension").property("value"));
     });
 
     setosaCheckbox.addEventListener("change", function() {
-        scatterplot.updateVis(check(setosaCheckbox, versicolorCheckbox, virginicaCheckbox), d3.select("#sepal-dimension").property("value"),
-            d3.select("#petal-dimension").property("value"));
+        scatterplot.updateVis(check(document.getElementById('setosa-check'), document.getElementById('versicolor-check'),
+            document.getElementById('virginica-check')), d3.select("#sepal-dimension").property("value"), d3.select("#petal-dimension").property("value"));
     });
     versicolorCheckbox.addEventListener("change", function() {
-        scatterplot.updateVis(check(setosaCheckbox, versicolorCheckbox, virginicaCheckbox), d3.select("#sepal-dimension").property("value"),
-            d3.select("#petal-dimension").property("value"));
+        scatterplot.updateVis(check(document.getElementById('setosa-check'), document.getElementById('versicolor-check'),
+            document.getElementById('virginica-check')), d3.select("#sepal-dimension").property("value"), d3.select("#petal-dimension").property("value"));
     });
     virginicaCheckbox.addEventListener("change", function() {
-        scatterplot.updateVis(check(setosaCheckbox, versicolorCheckbox, virginicaCheckbox), d3.select("#sepal-dimension").property("value"),
-            d3.select("#petal-dimension").property("value"));
+        scatterplot.updateVis(check(document.getElementById('setosa-check'), document.getElementById('versicolor-check'),
+            document.getElementById('virginica-check')), d3.select("#sepal-dimension").property("value"), d3.select("#petal-dimension").property("value"));
     });
 }
 
@@ -73,17 +73,4 @@ function check(setosaCheckbox, versicolorCheckbox, virginicaCheckbox) {
     }
 
     return checks;
-}
-
-function brushed() {
-
-	// Get the extent of the current brush
-	let selectionRange = d3.brushSelection(d3.select(".brush").node());
-	
-	// Convert the extent into the corresponding domain values
-	let selectionDomain = selectionRange.map((timeline.x).invert);
-	
-	// Update focus chart (detailed information)
-	areachart.x.domain(selectionDomain);
-	areachart.wrangleData();
 }
