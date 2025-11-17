@@ -21,9 +21,9 @@
     <div class="row">
         <div class="col-auto">
             <form class="row g-3">
-                <div class="col-auto">
+                <div class="col-15" id="dimensions">
                     <div class="form-group">
-                        <select class="form-control" id="sepal-dimension">
+                        <select class="form-control" id="sepal-dimension" style="font-family: Verdana, sans-serif">
                             <option value="sepal_width">Sepal width</option>
                             <option value="sepal_length">Sepal length</option>
                         </select>
@@ -32,9 +32,9 @@
             </form>
 
             <form class="row g-3">
-                <div class="col-auto">
+                <div class="col-15">
                     <div class="form-group">
-                        <select class="form-control" id="petal-dimension">
+                        <select class="form-control" id="petal-dimension" style="font-family: Verdana, sans-serif">
                             <option value="petal_width">Petal width</option>
                             <option value="petal_length">Petal length</option>
                         </select>
@@ -43,14 +43,15 @@
             </form>
         </div>
         <div class="col-auto">
-            <div class="row">
-                <div class="container" id="species-filter">
+            <div class="row" id="species-filter">
+                <h6>Species shown:</h6>
+                <div class="container" id="species-checkbox">
                     <input type="checkbox" id="setosa-check" name="setosa" value="setosa">
-                    <label for="setosa-check">Setosa</label>
+                    <label for="setosa-check" style="font-family: Verdana, sans-serif">Setosa</label>
                     <input type="checkbox" id="versicolor-check" name="versicolor" value="versicolor">
-                    <label for="versicolor-check">Versicolor</label>
+                    <label for="versicolor-check" style="font-family: Verdana, sans-serif">Versicolor</label>
                     <input type="checkbox" id="virginica-check" name="virginica" value="virginica">
-                    <label for="virginica-check">Virginica</label>
+                    <label for="virginica-check" style="font-family: Verdana, sans-serif">Virginica</label>
                 </div>
             </div>
         </div>

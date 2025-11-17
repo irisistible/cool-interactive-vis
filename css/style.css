@@ -1,0 +1,51 @@
+h1 {
+    font-weight: 100;
+    margin-top: 50px;
+    margin-bottom: 25px;
+    font-family: 'Verdana', sans-serif;
+    color: rgb(37, 2, 46);
+}
+
+h6 {
+    font-weight: 100;
+    margin-top: 50px;
+    font-family: 'Verdana', sans-serif;
+    color: rgb(37, 2, 46);
+}
+
+text {
+    font-family: 'Verdana', sans-serif;
+}
+
+body {
+    background-color: rgb(100, 64, 109);
+    padding: 50px;
+}
+
+.container {
+    background-color: rgb(225, 206, 243);
+    border-radius: 50px;
+    border: 15px solid rgba(86, 57, 116, 0.699);
+    padding-top: 10px;
+    padding-bottom: 25px;
+    padding-left: 20px;
+    padding-right: 25px;
+}
+
+option {
+    background-color: rgb(240, 230, 250);
+}
+
+.form-control {
+  background: rgb(240, 230, 250);
+  border: 1px solid rgb(187, 168, 206);
+}
+
+#dimensions {
+    padding-top: 5px;
+}
+
+#species-checkbox {
+    background-color: rgb(240, 230, 250);
+    border: 1px solid rgb(187, 168, 206);
+}

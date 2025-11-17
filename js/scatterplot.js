@@ -25,7 +25,7 @@ constructor(parentElement, data) {
 	initVis(){
 		let vis = this;
 
-		vis.margin = {top: 40, right: 40, bottom: 60, left: 40};
+		vis.margin = {top: 60, right: 40, bottom: 60, left: 40};
 
 		vis.width = document.getElementById(vis.parentElement).getBoundingClientRect().width - vis.margin.left - vis.margin.right;
 		vis.height = document.getElementById(vis.parentElement).getBoundingClientRect().height - vis.margin.top - vis.margin.bottom;
@@ -47,7 +47,7 @@ constructor(parentElement, data) {
 
 		// Scales and axes
 		vis.x = d3.scaleLinear()
-			.range([0, vis.width]);
+			.range([0, vis.width - 50]);
 
 		vis.y = d3.scaleLinear()
 			.range([vis.height, 0]);
@@ -58,14 +58,31 @@ constructor(parentElement, data) {
 		vis.yAxis = d3.axisLeft()
 			.scale(vis.y);
 
-		vis.svg.append("g")
+		let xAxisGroup = vis.svg.append("g")
 			.attr("class", "x-axis axis")
-			.attr("transform", "translate(0," + vis.height + ")")
+			.attr("transform", "translate(50," + vis.height + ")")
             .call(vis.xAxis);
 
-		vis.svg.append("g")
+		let yAxisGroup = vis.svg.append("g")
 			.attr("class", "y-axis axis")
+			.attr("transform", "translate(50, 0)")
             .call(vis.yAxis);
+
+		// Add axis labels
+		xAxisGroup.append("text")
+			.attr("class", "axis-label x-axis-label")
+			.attr("x", vis.width - 75)
+			.attr("y", 40)
+			.attr("text-anchor", "middle")
+			.attr("fill", "black");
+
+		yAxisGroup.append("text")
+			.attr("class", "axis-label y-axis-label")
+			.attr("x", 75)
+			.attr("y", 50)
+			.attr("text-anchor", "midle")
+			.attr("fill", "black")
+			.attr("transform", "rotate(90, 0, 0)");
 
 		// Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
 		// Its opacity is set to 0: we don't see it by default.
@@ -102,9 +119,9 @@ constructor(parentElement, data) {
 	updateVis(checks, sepalOption, petalOption){
 		let vis = this;
 
-		let colour = d3.scaleOrdinal()
-			.domain(["setosa", "versicolor", "virginica"])
-			.range(["#440154ff", "#21908dff", "#fde725ff"]);
+		let colour = {"setosa": "#440154ff", "versicolor": "#21908dff", "virginica": "#fde725ff"};
+
+		let dimension = ['width', 'length'];
 
 		let sepalOptions = ["sepal_width", "sepal_length"];
 		let sepalOptionIndex = 0;
@@ -153,15 +170,15 @@ constructor(parentElement, data) {
         dot.enter().append("circle")
 			.attr("class", d => "dot " + d.species)
 			.merge(dot)
-            .attr("cx", d => vis.x(d[sepalOptions[sepalOptionIndex]]))
+            .attr("cx", d => vis.x(d[sepalOptions[sepalOptionIndex]]) + 50)
             .attr("cy", d => vis.y(d[petalOptions[petalOptionIndex]]))
             .attr("r", 5)
-			.attr("fill", function (d) { return colour(d.species) })
+			.attr("fill", function (d) { return colour[d.species] })
 			.on("mousemove", function (event, d) {			
 				d3.selectAll("." + d.species)
 					.transition()
 					.duration(200)
-					.style("fill", colour(d.species))
+					.style("fill", colour[d.species])
 					.style("opacity", 1)
 					.attr("r", 10);
 
@@ -200,5 +217,11 @@ constructor(parentElement, data) {
 			.transition()
 			.duration(1000)
 			.call(vis.yAxis);
+
+		vis.svg.select(".x-axis-label")
+			.text("Sepal " + dimension[sepalOptionIndex]);
+
+		vis.svg.select(".y-axis-label")
+			.text("Petal " + dimension[petalOptionIndex]);
 	}
 }
