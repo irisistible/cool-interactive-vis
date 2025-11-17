@@ -67,6 +67,19 @@ constructor(parentElement, data) {
 			.attr("class", "y-axis axis")
             .call(vis.yAxis);
 
+		// Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
+		// Its opacity is set to 0: we don't see it by default.
+		vis.tooltip = d3.select("#chart-area")
+			.append("div")
+			.style("opacity", 0)
+			.attr("class", "tooltip")
+			.style("background-color", "white")
+			.style("border", "solid")
+			.style("border-width", "1px")
+			.style("border-radius", "5px")
+			.style("padding", "10px")
+			.style("position", "absolute");
+
 		// TO-DO: (Filter, aggregate, modify data)
 		vis.wrangleData();
 
@@ -79,19 +92,19 @@ constructor(parentElement, data) {
 		let vis = this;
 
 		// Update the visualization
-		vis.updateVis("sepal_width", "petal_width");
+		vis.updateVis({"setosa": 1, "versicolor": 1, "virginica": 1}, "sepal_width", "petal_width");
 	}
 
 	/*
 	 * The drawing function - should use the D3 update sequence (enter, update, exit)
  	* Function parameters only needed if different kinds of updates are needed
  	*/
-	updateVis(sepalOption, petalOption){
+	updateVis(checks, sepalOption, petalOption){
 		let vis = this;
 
 		let colour = d3.scaleOrdinal()
-			.domain(["setosa", "versicolor", "virginica" ])
-			.range([ "#440154ff", "#21908dff", "#fde725ff"]);
+			.domain(["setosa", "versicolor", "virginica"])
+			.range(["#440154ff", "#21908dff", "#fde725ff"]);
 
 		let sepalOptions = ["sepal_width", "sepal_length"];
 		let sepalOptionIndex = 0;
@@ -111,19 +124,23 @@ constructor(parentElement, data) {
 			petalOptionIndex = 1;
 		}
 
-		let maxX = d3.max(vis.data, function(d) {
+		let filteredData = vis.data.filter(function(d) {
+			return checks[d.species]
+		});
+
+		let maxX = d3.max(filteredData, function(d) {
 			return d[sepalOptions[sepalOptionIndex]];
 		});
 
-		let minX = d3.min(vis.data, function(d) {
+		let minX = d3.min(filteredData, function(d) {
 			return d[sepalOptions[sepalOptionIndex]];
 		});
 
-		let maxY = d3.max(vis.data, function(d) {
+		let maxY = d3.max(filteredData, function(d) {
 			return d[petalOptions[petalOptionIndex]];
 		});
 
-		let minY = d3.min(vis.data, function(d) {
+		let minY = d3.min(filteredData, function(d) {
 			return d[petalOptions[petalOptionIndex]];
 		})
 
@@ -131,19 +148,7 @@ constructor(parentElement, data) {
 		vis.y.domain([minY, maxY]);
 
         let dot = vis.svg.selectAll("circle")
-            .data(vis.data);
-
-		// Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
-		// Its opacity is set to 0: we don't see it by default.
-		let tooltip = d3.select("#chart-area")
-			.append("div")
-			.style("opacity", 0)
-			.attr("class", "tooltip")
-			.style("background-color", "white")
-			.style("border", "solid")
-			.style("border-width", "1px")
-			.style("border-radius", "5px")
-			.style("padding", "10px")
+            .data(filteredData);
 
         dot.enter().append("circle")
 			.attr("class", d => "dot " + d.species)
@@ -152,39 +157,36 @@ constructor(parentElement, data) {
             .attr("cy", d => vis.y(d[petalOptions[petalOptionIndex]]))
             .attr("r", 5)
 			.attr("fill", function (d) { return colour(d.species) })
-			.on("mouseover", function (d) {
-				let specie = d.srcElement.__data__.species;
-				
-				d3.selectAll(".dot")
+			.on("mousemove", function (event, d) {			
+				d3.selectAll("." + d.species)
 					.transition()
 					.duration(200)
-					.style("fill", "lightgrey")
-					.attr("r", 3);
-
-				d3.selectAll("." + specie)
-					.transition()
-					.duration(200)
-					.style("fill", colour(specie))
-					.attr("r", 7);
-
-				tooltip
+					.style("fill", colour(d.species))
 					.style("opacity", 1)
-					.html(specie);
-			})
+					.attr("r", 10);
+
+				vis.tooltip
+					.style("opacity", 1)
+					.style("left", event.pageX + 20 + "px")
+                	.style("top", event.pageY + "px")
+					.text("Specie: " + d.species);
+				})
     		.on("mouseleave", function () {
 				d3.selectAll(".dot")
 					.transition()
 					.duration(200)
-					.style("fill", "lightgrey")
-					.attr("r", 5 );
-
-				tooltip
+					.style("opacity", 0.5)
+					.attr("r", 5);
+				
+				vis.tooltip
 					.transition()
 					.duration(200)
 					.style("opacity", 0);
-			});
-		
-		dot.transition().duration(1000);
+			})
+			.style("opacity", 0)
+			.transition()
+			.duration(1000)
+			.style("opacity", 0.5);
 
         dot.exit().remove();
 

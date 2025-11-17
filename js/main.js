@@ -7,6 +7,14 @@ let scatterplot;
 loadData();
 
 function loadData() {
+    let setosaCheckbox = document.getElementById('setosa-check');
+    let versicolorCheckbox = document.getElementById('versicolor-check');
+    let virginicaCheckbox = document.getElementById('virginica-check');
+
+    setosaCheckbox.checked = true;
+    versicolorCheckbox.checked = true;
+    virginicaCheckbox.checked = true;
+    
     d3.csv("data/iris.csv", row => {
             
         // prepare data
@@ -21,12 +29,50 @@ function loadData() {
         scatterplot = new Scatterplot("chart-area", data);
 		scatterplot.initVis();
     });
-
+    
+    // Add event listeners
     d3.selectAll(".form-control").on("change", function() {
-        let sepalOption = d3.select("#sepal-dimension").property("value");
-        let petalOption = d3.select("#petal-dimension").property("value");
-        scatterplot.updateVis(sepalOption, petalOption);
+        scatterplot.updateVis(check(setosaCheckbox, versicolorCheckbox, virginicaCheckbox), d3.select("#sepal-dimension").property("value"),
+            d3.select("#petal-dimension").property("value"));
     });
+
+    setosaCheckbox.addEventListener("change", function() {
+        scatterplot.updateVis(check(setosaCheckbox, versicolorCheckbox, virginicaCheckbox), d3.select("#sepal-dimension").property("value"),
+            d3.select("#petal-dimension").property("value"));
+    });
+    versicolorCheckbox.addEventListener("change", function() {
+        scatterplot.updateVis(check(setosaCheckbox, versicolorCheckbox, virginicaCheckbox), d3.select("#sepal-dimension").property("value"),
+            d3.select("#petal-dimension").property("value"));
+    });
+    virginicaCheckbox.addEventListener("change", function() {
+        scatterplot.updateVis(check(setosaCheckbox, versicolorCheckbox, virginicaCheckbox), d3.select("#sepal-dimension").property("value"),
+            d3.select("#petal-dimension").property("value"));
+    });
+}
+
+function check(setosaCheckbox, versicolorCheckbox, virginicaCheckbox) {
+    let checks = {"setosa": 1, "versicolor": 1, "virginica": 1};
+
+    if (setosaCheckbox.checked) {
+            checks["setosa"] = 1;
+        }
+    else {
+        checks["setosa"] = 0;
+    }
+    if (versicolorCheckbox.checked) {
+        checks["versicolor"] = 1;
+    }
+    else {
+        checks["versicolor"] = 0;
+    }
+    if (virginicaCheckbox.checked) {
+        checks["virginica"] = 1;
+    }
+    else {
+        checks["virginica"] = 0;
+    }
+
+    return checks;
 }
 
 function brushed() {
